@@ -4,15 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.example.code06.entity.News;
-import com.example.code06.entity.NewsAdapter;
+import com.example.code06.entity.NewsAdapter_tmp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 //                new String []{NEWS_TITLE,NEWS_AUTHOR},
 //                new int []{android.R.id.text1, android.R.id.text2});
 
-        NewsAdapter newsAdapter = new NewsAdapter(MainActivity.this, R.layout.list_item, newsList);
+        NewsAdapter_tmp newsAdapter = new NewsAdapter_tmp(MainActivity.this, R.layout.list_item, newsList);
         ListView lvNewsList = findViewById(R.id.lv_news_list);
         lvNewsList.setAdapter(newsAdapter);
 

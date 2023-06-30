@@ -14,13 +14,13 @@ import com.example.code06.R;
 
 import java.util.List;
 
-public class NewsAdapter extends ArrayAdapter<News> {
+public class NewsAdapter_tmp extends ArrayAdapter<News> {
 
     private List<News>mNewsData;
     private Context mContext;
     private int resourceId;
 
-    public NewsAdapter(Context context, int resourceId, List<News>data) {
+    public NewsAdapter_tmp(Context context, int resourceId, List<News>data) {
         super(context, resourceId, data);
         this.mContext = context;
         this.mNewsData = data;
@@ -57,7 +57,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
         ImageView ivImage;
     }
 
-    public NewsAdapter(@NonNull Context context, int resource, int textViewResourceId, @NonNull List<News> objects) {
+    public NewsAdapter_tmp(@NonNull Context context, int resource, int textViewResourceId, @NonNull List<News> objects) {
         super(context, resource, textViewResourceId, objects);
     }
 }

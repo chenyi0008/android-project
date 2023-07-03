@@ -1,10 +1,23 @@
-package com.example.code06.entity;
+package com.example.code07.entity;
+
+import android.graphics.Bitmap;
 
 public class News {
     private String mTitle;
     private String mAuthor;
     private String mContent;
     private int mImageId;
+
+    public Bitmap getImage() {
+        return mImage;
+    }
+
+    public void setImage(Bitmap mImage) {
+        this.mImage = mImage;
+    }
+
+    private Bitmap mImage;
+
 
     public String getTitle(){
         return mTitle;

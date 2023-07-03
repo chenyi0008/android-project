@@ -52,8 +52,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
 
     @Override
-    public void onBindViewHolder(ViewHolder holder,
-                                 int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         News news = mNewsData.get(position);
         holder.tvTitle.setText(news.getTitle());
         holder.tvAuthor.setText(news.getAuthor());
@@ -66,9 +65,5 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     public int getItemCount (){
         return mNewsData.size ();
     }
-
-
-
-
 
 }

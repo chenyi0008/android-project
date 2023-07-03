@@ -34,13 +34,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.lv_news_list);
         initData();
 
-        newsAdapter = new NewsAdapter(MainActivity.this, R.layout.list_item, newsList);
+        newsAdapter = new NewsAdapter(MainActivity.this, R.layout.list_item, newsList); // 创建新闻适配器
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setAdapter(newsAdapter);
-
-
+        recyclerView.setLayoutManager(llm); // 设置布局管理器为线性布局管理器
+        recyclerView.setAdapter(newsAdapter); // 设置适配器给RecyclerView
     }
 
     private static final String NEWS_TITLE = "news_title";

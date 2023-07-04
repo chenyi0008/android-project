@@ -2,6 +2,7 @@ package com.example.code07;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.res.TypedArray;
@@ -36,16 +37,17 @@ public class MainActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
 
-    private ListView lvNewsList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.lv_news_list);
-        initData();
+//        recyclerView = findViewById(R.id.lv_news_list);
+//        LinearLayoutManager llm = new LinearLayoutManager(this);
+//        recyclerView.setLayoutManager(llm); // 设置布局管理器为线性布局管理器
+//        recyclerView.setAdapter(newsAdapter); // 设置适配器给RecyclerView
+//        initData();
 
         myDbHelper = new MyDbOpenHelper(MainActivity.this);
         db = myDbHelper.getReadableDatabase();
@@ -55,9 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         newsAdapter = new NewsAdapter(MainActivity.this, R.layout.list_item, newsList); // 创建新闻适配器
 
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(llm); // 设置布局管理器为线性布局管理器
-        recyclerView.setAdapter(newsAdapter); // 设置适配器给RecyclerView
+
+
 
         List<News> newsList = new ArrayList<>();
 
@@ -83,6 +84,13 @@ public class MainActivity extends AppCompatActivity {
             news.setImage(bitmap);
             newsList.add(news);
         }
+
+        NewsAdapter newsAdapter = new NewsAdapter(
+                MainActivity.this,
+                R.layout.list_item,
+                newsList);
+        ListView lvNewsList = findViewById(R.id.lv_news_list);
+        lvNewsList.setAdapter(newsAdapter);
     }
 
     private static final String NEWS_TITLE = "news_title";
@@ -108,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
             news.setImageId(images.getResourceId(i, 0));
             newsList.add(news);
         }
+
+
 
 
     }

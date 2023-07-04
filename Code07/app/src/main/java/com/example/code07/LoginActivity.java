@@ -3,12 +3,15 @@ package com.example.code07;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +21,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText etPwd;
     private EditText etAccount;
     private CheckBox cbRememberPwd;
+    private Boolean bPwdSwitch = false;
 
 
     @Override
@@ -58,6 +62,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             etPwd.setText(password);
         }
         cbRememberPwd.setChecked(rememberPassword);
+
+        final ImageView ivPwdSwitch = findViewById(R.id.iv_pwd_switch);
+        ivPwdSwitch.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                bPwdSwitch = !bPwdSwitch;
+                if (bPwdSwitch) {
+                    ivPwdSwitch.setImageResource(
+                            R.drawable.ic_baseline_visibility_24);
+                    etPwd.setInputType(
+                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                } else {
+                    ivPwdSwitch.setImageResource(
+                            R.drawable.ic_baseline_visibility_off_24);
+                    etPwd.setInputType(
+                            InputType.TYPE_TEXT_VARIATION_PASSWORD |
+                                    InputType.TYPE_CLASS_TEXT);
+                    etPwd.setTypeface(Typeface.DEFAULT);
+                }
+            }
+        });
 
     }
 

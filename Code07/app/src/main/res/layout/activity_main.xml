@@ -11,14 +11,22 @@
         android:id="@+id/lv_news_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="16dp"
+
+
+        android:layout_marginBottom="6dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:dividerHeight="8dp"
+        android:divider="@android:color/transparent"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
+    <!--    <androidx.recyclerview.widget.RecyclerView-->
 <!--        android:id="@+id/lv_news_list"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="0dp"-->

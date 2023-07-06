@@ -8,12 +8,15 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import com.bumptech.glide.Glide;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,13 +38,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tvBottomTitle;
     private TextView tvBottomArtist;
     private ImageView ivAlbumThumbnail;
+
+    private ContentResolver mContentResolver;
     private View ivPlay;
+
+    public static final String DATA_URI =
+            "com.glriverside.xgqin.ggmusic.DATA_URI";
+    public static final String TITLE =
+            "com.glriverside.xgqin.ggmusic.TITLE";
+    public static final String ARTIST =
+            "com.glriverside.xgqin.ggmusic.ARTIST";
 
     private MediaPlayer mMediaPlayer = null;
     private final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
 
     private ListView mPlaylist;
@@ -54,10 +66,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         // 初始化主活动布局
-
+        mContentResolver = getContentResolver();
         mPlaylist = findViewById(R.id.lv_playlist);
         mCursorAdapter = new MediaCursorAdapter(MainActivity.this);
         mPlaylist.setAdapter(mCursorAdapter);
+
 
         // 查找并设置使用自定义光标适配器的媒体播放列表 ListView
 
@@ -79,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LayoutInflater.from(MainActivity.this).inflate(R.layout.bottom_media_toolbar, navigation, true);
 
         // 查找并填充底部媒体工具栏布局
-
         ivPlay = navigation.findViewById(R.id.iv_play);
         tvBottomTitle = navigation.findViewById(R.id.tv_bottom_title);
         tvBottomArtist = navigation.findViewById(R.id.tv_bottom_artist);
@@ -91,11 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ivPlay.setOnClickListener(MainActivity.this);
         }
 
-        // 为底部媒体工具栏中的播放按钮设置 OnClickListener
+        // 初始状态下隐藏底部媒体工具栏
 
         navigation.setVisibility(View.GONE);
 
-        // 初始状态下隐藏底部媒体工具栏
+        // 为底部媒体工具栏中的播放按钮设置 OnClickListener
 
         mPlaylist.setOnItemClickListener(itemClickListener);
     }
@@ -205,23 +217,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 根据数据路径创建Uri对象
                 Uri dataUri = Uri.parse(data);
 
+                //加载新的音乐播放信息
+                navigation.setVisibility(View.VISIBLE);
 
-                if (mMediaPlayer != null) {
-                    // 如果媒体播放器对象不为空
-
-                    try {
-                        // 重置媒体播放器
-                        mMediaPlayer.reset();
-                        // 设置媒体播放器的数据源为当前点击项的数据路径
-                        mMediaPlayer.setDataSource(MainActivity.this, dataUri);
-                        // 准备媒体播放器
-                        mMediaPlayer.prepare();
-                        // 开始播放音频
-                        mMediaPlayer.start();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                if (tvBottomTitle != null) {
+                    tvBottomTitle.setText(title);
                 }
+                if (tvBottomArtist != null) {
+                    tvBottomArtist.setText(artist);
+                }
+
+                Uri albumUri = ContentUris.withAppendedId(
+                        MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                        albumId);
+
+                Cursor albumCursor = mContentResolver.query(
+                        albumUri,
+                        null,
+                        null,
+                        null,
+                        null);
+
+                if (albumCursor != null && albumCursor.getCount() > 0) {
+                    albumCursor.moveToFirst();
+                    int albumArtIndex = albumCursor.getColumnIndex(
+                            MediaStore.Audio.Albums.ALBUM_ART);
+                    String albumArt = albumCursor.getString(
+                            albumArtIndex);
+                    Glide.with(MainActivity.this)
+                            .load(albumArt)
+                            .into(ivAlbumThumbnail);
+                    albumCursor.close();
+                }
+
+
+
+
+                Intent serviceIntent =
+                        new Intent(MainActivity.this, MusicService.class);
+                serviceIntent.putExtra(MainActivity.DATA_URI, data);
+                serviceIntent.putExtra(MainActivity.TITLE, title);
+                serviceIntent.putExtra(MainActivity.ARTIST, artist);
+                startService(serviceIntent);
+
+
             }
         }
     };

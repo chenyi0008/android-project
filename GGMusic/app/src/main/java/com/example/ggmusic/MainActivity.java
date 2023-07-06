@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     private ListView mPlaylist;
+    //CursorAdapter 用于在列表视图（如 ListView）中显示数据库查询结果的数据
     private CursorAdapter mCursorAdapter;
 
     @Override
@@ -50,45 +53,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 初始化主活动布局
+
         mPlaylist = findViewById(R.id.lv_playlist);
         mCursorAdapter = new MediaCursorAdapter(MainActivity.this);
         mPlaylist.setAdapter(mCursorAdapter);
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    MainActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                // Explain why the app needs the permission (optional)
+        // 查找并设置使用自定义光标适配器的媒体播放列表 ListView
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // 检查是否未授予 READ_EXTERNAL_STORAGE 权限
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // 解释应用程序为何需要该权限（可选）
             } else {
+                // 请求 READ_EXTERNAL_STORAGE 权限
                 requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             }
         } else {
+            // 已授予 READ_EXTERNAL_STORAGE 权限，继续进行播放列表初始化
             initPlaylist();
         }
 
-
         navigation = findViewById(R.id.navigation);
-        LayoutInflater.from(MainActivity.this)
-                .inflate(R.layout.bottom_media_toolbar,
-                        navigation,
-                        true);
+        LayoutInflater.from(MainActivity.this).inflate(R.layout.bottom_media_toolbar, navigation, true);
+
+        // 查找并填充底部媒体工具栏布局
 
         ivPlay = navigation.findViewById(R.id.iv_play);
         tvBottomTitle = navigation.findViewById(R.id.tv_bottom_title);
         tvBottomArtist = navigation.findViewById(R.id.tv_bottom_artist);
         ivAlbumThumbnail = navigation.findViewById(R.id.iv_thumbnail);
 
+        // 在底部媒体工具栏中查找播放按钮、标题、艺术家和缩略图 ImageView
+
         if (ivPlay != null) {
             ivPlay.setOnClickListener(MainActivity.this);
         }
 
+        // 为底部媒体工具栏中的播放按钮设置 OnClickListener
+
         navigation.setVisibility(View.GONE);
+
+        // 初始状态下隐藏底部媒体工具栏
+
+        mPlaylist.setOnItemClickListener(itemClickListener);
     }
+
 
     private void initPlaylist() {
         ContentResolver contentResolver = getContentResolver();
+
+        // 获取内容解析器
+
         Cursor cursor = contentResolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,
@@ -98,10 +115,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 null
         );
 
+        // 查询媒体库中符合条件的音频文件
+
         if (cursor != null) {
             mCursorAdapter.changeCursor(cursor);
         }
+
+        // 如果光标不为空，则将光标更新到 mCursorAdapter 中
     }
+
 
 
     @Override
@@ -109,17 +131,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                            String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // 处理权限请求的回调方法
+
         switch (requestCode) {
             case REQUEST_EXTERNAL_STORAGE:
+                // 检查请求代码
+
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 检查权限授予结果是否为授予
+
                     initPlaylist();
+                    // 初始化播放列表
                 }
                 break;
             default:
                 break;
         }
     }
+
 
     @Override
     protected void onStart() {
@@ -138,40 +169,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         super.onStop();
     }
-
     private ListView.OnItemClickListener itemClickListener
             = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView,
                                 View view, int i, long l) {
+            // 当用户点击列表项时触发的回调方法
+
+            // 获取适配器中的游标对象
             Cursor cursor = mCursorAdapter.getCursor();
             if (cursor != null && cursor.moveToPosition(i)) {
+                // 如果游标不为空且移动到指定位置成功
 
+                // 获取音频标题在游标中的索引
                 int titleIndex = cursor.getColumnIndex(
                         MediaStore.Audio.Media.TITLE);
+                // 获取音频艺术家在游标中的索引
                 int artistIndex = cursor.getColumnIndex(
                         MediaStore.Audio.Media.ARTIST);
+                // 获取音频专辑ID在游标中的索引
                 int albumIdIndex = cursor.getColumnIndex(
                         MediaStore.Audio.Media.ALBUM_ID);
+                // 获取音频数据路径在游标中的索引
                 int dataIndex = cursor.getColumnIndex(
                         MediaStore.Audio.Media.DATA);
 
-
-
+                // 通过索引获取当前点击项的音频标题、艺术家、专辑ID和数据路径
                 String title = cursor.getString(titleIndex);
                 String artist = cursor.getString(artistIndex);
                 Long albumId = cursor.getLong(albumIdIndex);
                 String data = cursor.getString(dataIndex);
 
-
+                Toast.makeText(MainActivity.this, "开始播放：" + title, Toast.LENGTH_SHORT).show();
+                Log.d("data", data);
+                // 根据数据路径创建Uri对象
                 Uri dataUri = Uri.parse(data);
 
+
                 if (mMediaPlayer != null) {
+                    // 如果媒体播放器对象不为空
+
                     try {
+                        // 重置媒体播放器
                         mMediaPlayer.reset();
-                        mMediaPlayer.setDataSource(
-                                MainActivity.this, dataUri);
+                        // 设置媒体播放器的数据源为当前点击项的数据路径
+                        mMediaPlayer.setDataSource(MainActivity.this, dataUri);
+                        // 准备媒体播放器
                         mMediaPlayer.prepare();
+                        // 开始播放音频
                         mMediaPlayer.start();
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -181,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
@@ -188,6 +234,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        
+
     }
 }

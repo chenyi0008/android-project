@@ -5,7 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -22,6 +25,7 @@ public class MusicService extends Service {
     private static final int ONGOING_NOTIFICATION_ID = 1001;
     private static final String CHANNEL_ID = "Music channel";
     NotificationManager mNotificationManager;
+
 
 
 
@@ -44,7 +48,7 @@ public class MusicService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return mBinder;
     }
 
     @Override
@@ -62,6 +66,10 @@ public class MusicService extends Service {
                         dataUri);
                 mMediaPlayer.prepare();
                 mMediaPlayer.start();
+
+                Intent musicStartIntent =
+                        new Intent(MainActivity.ACTION_MUSIC_START);
+                sendBroadcast(musicStartIntent);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -102,12 +110,59 @@ public class MusicService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-//    private final IBinder mBinder = new MusicServiceBinder();
-    
+    private final IBinder mBinder = new MusicServiceBinder();
 
-//    public class MusicServiceBinder extends Binder {
-//        MusicService getService() {
-//            return MusicService.this;
-//        }
-//    }
+
+    public class MusicServiceBinder extends Binder {
+        MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
+
+
+    public void pause() {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+        }
+    }
+
+    public void play() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.start();
+        }
+    }
+
+    public int getDuration() {
+        int duration = 0;
+
+        if (mMediaPlayer != null) {
+            duration = mMediaPlayer.getDuration();
+        }
+
+        return duration;
+    }
+
+    public int getCurrentPosition() {
+        int position = 0;
+
+        if (mMediaPlayer != null) {
+            position = mMediaPlayer.getCurrentPosition();
+        }
+
+        return position;
+    }
+
+    public boolean isPlaying() {
+
+        if (mMediaPlayer != null) {
+            return mMediaPlayer.isPlaying();
+        }
+        return false;
+    }
+
+
+
+
+
 }

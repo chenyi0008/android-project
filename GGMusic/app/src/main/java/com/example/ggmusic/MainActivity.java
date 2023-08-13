@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String ARTIST =
             "com.glriverside.xgqin.ggmusic.ARTIST";
 
-    private MediaPlayer mMediaPlayer = null;
     private final int REQUEST_EXTERNAL_STORAGE = 1;
 
     public static final String ACTION_MUSIC_START =
@@ -238,6 +237,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // 获取适配器中的游标对象
             Cursor cursor = mCursorAdapter.getCursor();
+            mPlayStatus = true;
+            ivPlay.setImageResource(
+                    R.drawable.baseline_pause_circle_outline_24);
             if (cursor != null && cursor.moveToPosition(i)) {
                 // 如果游标不为空且移动到指定位置成功
 
@@ -295,6 +297,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Glide.with(MainActivity.this)
                             .load(albumArt)
                             .into(ivAlbumThumbnail);
+
+                    ivAlbumThumbnail.setImageResource(R.drawable.baseline_library_music_24);
+
                     albumCursor.close();
                 }
 
@@ -307,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 serviceIntent.putExtra(MainActivity.TITLE, title);
                 serviceIntent.putExtra(MainActivity.ARTIST, artist);
                 startService(serviceIntent);
+
 
 
             }
@@ -336,22 +342,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
+    // 创建一个ServiceConnection对象mConn，用于连接到服务
     private ServiceConnection mConn = new ServiceConnection() {
+        // 当服务连接成功时调用该方法
         @Override
         public void onServiceConnected(
                 ComponentName componentName, IBinder iBinder) {
             MusicService.MusicServiceBinder binder =
                     (MusicService.MusicServiceBinder) iBinder;
 
+            // 获取MusicService的实例并赋值给mService变量
             mService = binder.getService();
+
+            // 标记服务已绑定
             mBound = true;
         }
 
+        // 当服务断开连接时调用该方法
         @Override
         public void onServiceDisconnected(
                 ComponentName componentName) {
+            // 将mService变量设为null
             mService = null;
+
+            // 标记服务未绑定
             mBound = false;
         }
     };

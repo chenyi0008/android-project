@@ -14,6 +14,18 @@ import java.util.List;
 
 public class NewsAdapter extends ArrayAdapter<News> {
 
+    public interface onDeleteClick {
+        void onDelete(int pos);
+    }
+
+    onDeleteClick onDeleteClick;
+
+    public void setOnDeleteClick(NewsAdapter.onDeleteClick onDeleteClick) {
+        this.onDeleteClick = onDeleteClick;
+    }
+
+
+
     private List<News> mNewsData;
     private Context mContext;
     private int resourceId;
@@ -58,6 +70,11 @@ public class NewsAdapter extends ArrayAdapter<News> {
 
         Glide.with(mContext).load(news.getPicUrl())
                 .into(vh.ivImage);
+
+        vh.ivDelete.setOnClickListener(v -> {
+            if (position == -1) return;
+            onDeleteClick.onDelete(position);
+        });
 
         return view;
     }

@@ -61,7 +61,10 @@ public class News {
     }
 
     public String getPicUrl() {
-        return picUrl;
+        if (picUrl.equals(""))
+        return "https://th.bing.com/th/id/R.d673952007be76b266aa965c5de5c5c2?rik=NZBSmmQG7vuV1g&riu=http%3a%2f%2fwww.kuaipng.com%2fUploads%2fpic%2fwater%2f13450%2fgoods_water_13450_698_698_.png&ehk=pEIvhJ7NBlyPvRbGLwivy%2bONiD%2bFQ6Xerwx5qHNP9iM%3d&risl=&pid=ImgRaw&r=0";
+        else if(!picUrl.startsWith("http")) return "https://" + picUrl;
+        else return picUrl;
     }
 
     public void setPicUrl(String picUrl) {

@@ -89,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
         lvNewsList.setAdapter(adapter);
 
+        adapter.setOnDeleteClick(new NewsAdapter.onDeleteClick() {
+            @Override
+            public void onDelete(int pos) {
+                newsData.remove(pos);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
         refreshData(page);
     }
 
@@ -112,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
                     OkHttpClient client = new OkHttpClient();
                     client.newCall(request).enqueue(callback);
                 } catch (NetworkOnMainThreadException ex) {
-
                     ex.printStackTrace();
                 }
             }
@@ -137,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra(Constants.NEWS_DETAIL_URL_KEY, url);
 
                         startActivity(intent);
+
                     }
                 });
     }
